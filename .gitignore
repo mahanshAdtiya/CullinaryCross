@@ -1,2 +1,7 @@
 node_modules/
 .next/
+package-lock.json
+dist/
+dist-ssr/
+*.local
+.DS_Store
