@@ -16,11 +16,11 @@ interface WordLayout {
 
 const CrosswordGrid: React.FC = () => {
   type Difficulty = "Easy" | "Normal" | "Hard";
-  const initialScore = 0;
+  const initialScore = 1000;
   const hintDeduction = {
-    Easy: 1,
-    Normal: 2,
-    Hard: 3,
+    Easy: 2,
+    Normal: 4,
+    Hard: 6,
   };
 
   const [difficulty, setDifficulty] = useState<Difficulty>(() => {
@@ -75,19 +75,26 @@ const CrosswordGrid: React.FC = () => {
         "You have used the maximum number of hints for this difficulty level."
       );
       setAllHintsUsed(true);
-    }
-
-    const unsolvedCells = [];
-    for (const [key, value] of Object.entries(userInput)) {
-      if (
-        value !== grid[parseInt(key.split(",")[0])][parseInt(key.split(",")[1])]
-      ) {
-        unsolvedCells.push(key);
-      }
+      console.log(`Score: ${score}`);
+      localStorage.setItem("score", score.toString());
     }
 
     if (!allHintsUsed) {
-      if (unsolvedCells.length === 0) return;
+      const unsolvedCells = [];
+      for (const [key, value] of Object.entries(userInput)) {
+        if (
+          value !==
+          grid[parseInt(key.split(",")[0])][parseInt(key.split(",")[1])]
+        ) {
+          `1`;
+          unsolvedCells.push(key);
+        }
+      }
+
+      if (unsolvedCells.length === 0) {
+        localStorage.setItem("score", score.toString());
+        return;
+      }
 
       const randomCellKey =
         unsolvedCells[Math.floor(Math.random() * unsolvedCells.length)];
@@ -101,10 +108,16 @@ const CrosswordGrid: React.FC = () => {
 
       setScore((prevScore) => {
         const deduction = hintDeduction[difficulty as Difficulty];
-        return Math.max(prevScore - deduction);
+        if (deduction === 2) {
+          return Math.max(prevScore - deduction);
+        } else if (deduction === 4) {
+          return Math.max(prevScore - deduction, 960);
+        } else {
+          return Math.max(prevScore - deduction, 970);
+        }
       });
 
-      setHintsUsed(hintsUsed + 1);
+      setHintsUsed((prevHintsUsed) => prevHintsUsed + 1);
     }
   };
 
@@ -179,9 +192,39 @@ const CrosswordGrid: React.FC = () => {
 
   const handleNext = () => {
     if (difficulty === "Easy") {
-      updateDifficulty("Normal");
+      const unsolvedCells = [];
+      for (const [key, value] of Object.entries(userInput)) {
+        if (
+          value !==
+          grid[parseInt(key.split(",")[0])][parseInt(key.split(",")[1])]
+        ) {
+          `1`;
+          unsolvedCells.push(key);
+        }
+      }
+
+      if (unsolvedCells.length === 0) {
+        updateDifficulty("Normal");
+      } else {
+        alert("You have not completed the crossword yet.");
+      }
     } else if (difficulty === "Normal") {
-      updateDifficulty("Hard");
+      const unsolvedCells = [];
+      for (const [key, value] of Object.entries(userInput)) {
+        if (
+          value !==
+          grid[parseInt(key.split(",")[0])][parseInt(key.split(",")[1])]
+        ) {
+          `1`;
+          unsolvedCells.push(key);
+        }
+      }
+
+      if (unsolvedCells.length === 0) {
+        updateDifficulty("Hard");
+      } else {
+        alert("You have not completed the crossword yet.");
+      }
     } else {
       setCompleted(true);
       localStorage.removeItem("score");
@@ -225,11 +268,6 @@ const CrosswordGrid: React.FC = () => {
       );
 
       setShowSuccessAlert(isCompletedCorrectly);
-      // setScore((prevScore) => {
-      //   const newScore = prevScore + 10;
-      //   localStorage.setItem("score", String(newScore));
-      //   return newScore;
-      // });
     };
 
     const timer = setTimeout(checkCompletion, 100);
@@ -302,7 +340,12 @@ const CrosswordGrid: React.FC = () => {
       [key]: newInput,
     }));
 
+    const isCorrect = newInput === expectedChar;
+
+    const borderColor = isCorrect ? "green" : "gray";
+
     const moveNext = () => {
+      // Determine the orientation of the current word
       const isHorizontal =
         wordPlacements[`${rowIndex},${cellIndex + 1}`] !== undefined ||
         wordPlacements[`${rowIndex},${cellIndex - 1}`] !== undefined;
@@ -310,11 +353,12 @@ const CrosswordGrid: React.FC = () => {
       let nextCellIndex = cellIndex;
 
       if (isHorizontal) {
-        nextCellIndex += 1;
+        nextCellIndex += 1; // Move right for horizontal
       } else {
-        nextRowIndex += 1;
+        nextRowIndex += 1; // Move down for vertical
       }
 
+      // Check if the next cell is within the grid and not empty
       if (
         nextRowIndex < grid.length &&
         nextCellIndex < grid[0].length &&
@@ -329,35 +373,8 @@ const CrosswordGrid: React.FC = () => {
     };
 
     if (newInput && grid[rowIndex][cellIndex] === newInput) {
-      moveNext();
+      moveNext(); // Move to the next cell if the input matches the expected character
     }
-
-    const checkWordCompletion = () => {
-      layoutResult.forEach((word) => {
-        const isCompleted = word.answer.split("").every((char, index) => {
-          const key =
-            word.orientation === "across"
-              ? `${word.starty - 1},${word.startx - 1 + index}`
-              : `${word.starty - 1 + index},${word.startx - 1}`;
-          return userInput[key]?.toLowerCase() === char.toLowerCase();
-        });
-
-        if (isCompleted && !correctWords[word.answer]) {
-          setScore((prevScore) => {
-            const newScore = prevScore + 10;
-            // console.log(`Score: ${newScore}`);
-            localStorage.setItem("score", String(newScore));
-            return newScore;
-          });
-          setCorrectWords((prevCorrectWords) => ({
-            ...prevCorrectWords,
-            [word.answer]: true,
-          }));
-        }
-      });
-    };
-
-    checkWordCompletion();
   };
 
   if (isLoading) {
