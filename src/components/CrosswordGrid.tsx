@@ -418,12 +418,12 @@ const CrosswordGrid: React.FC = () => {
                       } w-full h-full`}
                       maxLength={1}
                       value={userInput[key]}
-                      onChange={(e) =>
-                        handleInputChange(e, rowIndex, cellIndex)
-                      }
+                      onChange={(e) => handleInputChange(e, rowIndex, cellIndex)}
                       onKeyDown={(e) => handleKeyDown(e, rowIndex, cellIndex)}
                       data-key={`${rowIndex},${cellIndex}`}
                       disabled={!cell}
+                      id={`textarea-${rowIndex}-${cellIndex}`}
+                      name={`textarea-${rowIndex}-${cellIndex}`} 
                       style={{
                         resize: "none",
                         overflow: "hidden",
