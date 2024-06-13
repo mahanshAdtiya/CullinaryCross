@@ -1,7 +1,7 @@
-import React from 'react'; 
-import { useState } from 'react';
+import React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle"
+import { Toggle } from "@/components/ui/toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,38 +17,56 @@ interface CustomizePanelProps {
   onPrint: () => void;
 }
 
-const CustomizePanel: React.FC<CustomizePanelProps> = ({ onUpdateDifficulty, onUseHint, onPrint }) => {
-  const [currentDifficulty, setCurrentDifficulty] = useState('Easy'); 
+const CustomizePanel: React.FC<CustomizePanelProps> = ({
+  onUpdateDifficulty,
+  onUseHint,
+  onPrint,
+}) => {
+  const [currentDifficulty, setCurrentDifficulty] = useState("Easy");
 
   const handleUpdateDifficulty = (difficulty: string) => {
-    setCurrentDifficulty(difficulty); 
-    onUpdateDifficulty(difficulty);    
+    setCurrentDifficulty(difficulty);
+    onUpdateDifficulty(difficulty);
   };
 
   return (
-    <div className="customize-panel items-center px-3">
-      <div className="text-xl">Difficulty Level:</div>
-      <div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="border-2 border-gray-300 rounded-md px-2 py-1 hover:border-gray-400">
-              {currentDifficulty} 
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Select difficulty</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Easy")}>Easy</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Normal")}>Normal</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Hard")}>Hard</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <>
+      <div className="flex customize-panel items-center gap-4">
+        <div className="flex text-xl">Difficulty Level:</div>
+        <div className="flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="border-2 border-gray-300 rounded-md px-2 py-1 hover:border-gray-400">
+                {currentDifficulty} {/* Display the current difficulty */}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Select difficulty</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Easy")}>
+                Easy
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => handleUpdateDifficulty("Normal")}
+              >
+                Normal
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Hard")}>
+                Hard
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-      <div className='mt-4'>
-        <Button variant="outline" onClick={onUseHint}>Hint</Button>
-        <Button variant="outline" onClick={onPrint}>Print</Button>
+      <div className="mt-4">
+        <Button className="mr-4" variant="outline" onClick={onUseHint}>
+          Hint
+        </Button>
+        <Button variant="outline" onClick={onPrint}>
+          Print
+        </Button>
       </div>
-    </div>
+    </>
   );
 };
 
