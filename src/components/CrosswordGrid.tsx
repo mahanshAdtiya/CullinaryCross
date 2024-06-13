@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useRef, useEffect } from "react";
 import { generateLayout } from "../lib/layout_generator";
 import LeftPanel from "./LeftPanel";
@@ -23,22 +22,21 @@ const CrosswordGrid: React.FC = () => {
     Normal: 20,
     Hard: 30,
   };
+
+  const [difficulty, setDifficulty] = useState<Difficulty>(() => {
+    return (localStorage.getItem("difficulty") as Difficulty) || "Easy";
+  });
+
   const [grid, setGrid] = useState<string[][]>([]);
   const [score, setScore] = useState(initialScore);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
-  // const [hintUsed, setHintUsed] = useState(false);
-  const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
   const [wordPlacements, setWordPlacements] = useState<Record<string, boolean>>(
     {}
   );
   const [clues, setClues] = useState<Record<string, string>>({});
   const [layoutResult, setLayoutResult] = useState<WordLayout[]>([]);
-  // const [numberPositions, setNumberPositions] = useState<Record<string, number>>({});
   const [userInput, setUserInput] = useState<Record<string, string>>({});
-  // const [timerEnabled, setTimerEnabled] = useState(false);
-  // const [startTime, setStartTime] = useState<Date | null>(null);
-  // const [elapsedTime, setElapsedTime] = useState(0);
   const [feedbackEnabled, setFeedbackEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,6 +54,7 @@ const CrosswordGrid: React.FC = () => {
       setDifficulty(newDifficulty as Difficulty);
       setScore(initialScore);
       setHintsUsed(0);
+      localStorage.setItem("difficulty", newDifficulty);
       window.location.reload();
     } else {
       console.error("Invalid difficulty level:", newDifficulty);
@@ -93,8 +92,6 @@ const CrosswordGrid: React.FC = () => {
       [randomCellKey]: correctChar,
     }));
 
-    // setHintUsed(true);
-
     setScore((prevScore) => {
       const deduction = hintDeduction[difficulty as Difficulty];
       return Math.max(prevScore - deduction, 0);
@@ -102,20 +99,6 @@ const CrosswordGrid: React.FC = () => {
 
     setHintsUsed(hintsUsed + 1);
   };
-
-  // useEffect(() => {
-  //   let interval: NodeJS.Timeout;
-
-  //   if (timerEnabled && startTime) {
-  //     interval = setInterval(() => {
-  //       setElapsedTime(new Date().getTime() - startTime.getTime());
-  //     }, 1000);
-  //   }
-
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, [timerEnabled, startTime]);
 
   useEffect(() => {
     const wordCount =
@@ -137,14 +120,11 @@ const CrosswordGrid: React.FC = () => {
       }
     });
 
-    // setNumberPositions(numberPositionsTemp);
-
     const updatedLayoutResult = layout.result.map(
       (word: any) => {
         const correspondingWord = wordsList.find(
           (wordObj: any) => wordObj.word.toLowerCase() === word.answer
         );
-        console.log(correspondingWord);
         return correspondingWord
           ? { ...word, clue: correspondingWord.clue }
           : word;
@@ -271,7 +251,7 @@ const CrosswordGrid: React.FC = () => {
           rowIndex < 0 ||
           rowIndex >= grid.length ||
           cellIndex < 0 ||
-          cellIndex >= grid[0].length
+          cellIndex >= grid[rowIndex].length
         ) {
           break;
         }
@@ -335,6 +315,7 @@ const CrosswordGrid: React.FC = () => {
       moveNext();
     }
   };
+
   if (isLoading) {
     return <>Loading...</>;
   }
@@ -358,7 +339,6 @@ const CrosswordGrid: React.FC = () => {
           />
         </div>
         <div className="flex items-center mt-4 ml-4 mb-5">
-          {/* Add margin above the score text */}
           <div className="text-xl mr-5">
             <strong>SCORE: {score}</strong>
           </div>
@@ -366,7 +346,6 @@ const CrosswordGrid: React.FC = () => {
       </div>
 
       <div className="flex w-full max-w-6xl">
-        {/* Crossword Grid */}
         <div ref={crosswordContainerRef} className="crossword-container">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
@@ -439,7 +418,6 @@ const CrosswordGrid: React.FC = () => {
             </div>
           ))}
         </div>
-        {/* Clues */}
         <div className="flex-1 items-center">
           <div className="crossword-clues px-5 py-1">
             {clues && <LeftPanel layoutResult={layoutResult} />}

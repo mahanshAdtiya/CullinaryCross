@@ -1,7 +1,5 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,11 +20,18 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
   onUseHint,
   onPrint,
 }) => {
-  const [currentDifficulty, setCurrentDifficulty] = useState("Easy");
+  const [currentDifficulty, setCurrentDifficulty] = useState(() => {
+    return localStorage.getItem("difficulty") || "Easy";
+  });
+
+  useEffect(() => {
+    setCurrentDifficulty(localStorage.getItem("difficulty") || "Easy");
+  }, []);
 
   const handleUpdateDifficulty = (difficulty: string) => {
     setCurrentDifficulty(difficulty);
     onUpdateDifficulty(difficulty);
+    localStorage.setItem("difficulty", difficulty);
   };
 
   return (
@@ -37,7 +42,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="border-2 border-gray-300 rounded-md px-2 py-1 hover:border-gray-400">
-                {currentDifficulty} {/* Display the current difficulty */}
+                {currentDifficulty}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -46,9 +51,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
               <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Easy")}>
                 Easy
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() => handleUpdateDifficulty("Normal")}
-              >
+              <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Normal")}>
                 Normal
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Hard")}>
