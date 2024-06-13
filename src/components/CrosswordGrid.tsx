@@ -16,11 +16,11 @@ interface WordLayout {
 
 const CrosswordGrid: React.FC = () => {
   type Difficulty = "Easy" | "Normal" | "Hard";
-  const initialScore = 1000;
+  const initialScore = 0;
   const hintDeduction = {
-    Easy: 10,
-    Normal: 20,
-    Hard: 30,
+    Easy: 1,
+    Normal: 2,
+    Hard: 3,
   };
 
   const [difficulty, setDifficulty] = useState<Difficulty>(() => {
@@ -30,6 +30,7 @@ const CrosswordGrid: React.FC = () => {
   const [grid, setGrid] = useState<string[][]>([]);
   const [score, setScore] = useState(initialScore);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [wordPlacements, setWordPlacements] = useState<Record<string, boolean>>(
     {}
@@ -180,6 +181,20 @@ const CrosswordGrid: React.FC = () => {
   //   window.print();
   // };
 
+  const handleNext = () => {
+    if (difficulty === "Easy") {
+      updateDifficulty("Normal");
+    } else if (difficulty === "Normal") {
+      updateDifficulty("Hard");
+    } else {
+      setCompleted(true);
+    }
+
+    // don't change the difficulty level, just reload the page
+    // setIsLoading(true);
+    // window.location.reload();
+  };
+
   useEffect(() => {
     const checkCompletion = () => {
       const isCompletedCorrectly = Object.entries(wordPlacements).every(
@@ -322,6 +337,14 @@ const CrosswordGrid: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
+      {completed && (
+        <Alert className="py-5 mb-4">
+          <AlertTitle>Congratulations!</AlertTitle>
+          <AlertDescription>
+            You have completed all levels. Well done!
+          </AlertDescription>
+        </Alert>
+      )}
       {showSuccessAlert && (
         <Alert className="py-5 mb-4">
           <AlertTitle>Great Job!</AlertTitle>
