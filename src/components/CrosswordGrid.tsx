@@ -40,6 +40,8 @@ const CrosswordGrid: React.FC = () => {
   const [userInput, setUserInput] = useState<Record<string, string>>({});
   const [feedbackEnabled, setFeedbackEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [correctWords, setCorrectWords] = useState<Record<string, boolean>>({});
+  const [allHintsUsed, setAllHintsUsed] = useState(false);
 
   const toggleFeedbackEnabled = () => {
     setFeedbackEnabled(!feedbackEnabled);
@@ -53,9 +55,11 @@ const CrosswordGrid: React.FC = () => {
     ) {
       setIsLoading(true);
       setDifficulty(newDifficulty as Difficulty);
-      setScore(initialScore);
       setHintsUsed(0);
       localStorage.setItem("difficulty", newDifficulty);
+      const sc = localStorage.getItem("score");
+      console.log("score", sc);
+      setScore(Number(sc) || initialScore);
       window.location.reload();
     } else {
       console.error("Invalid difficulty level:", newDifficulty);
@@ -64,12 +68,13 @@ const CrosswordGrid: React.FC = () => {
 
   const useHint = () => {
     if (
-      (difficulty === "Normal" && hintsUsed >= 10) ||
-      (difficulty === "Hard" && hintsUsed >= 5)
+      (difficulty === "Normal" && hintsUsed === 10) ||
+      (difficulty === "Hard" && hintsUsed === 5)
     ) {
       alert(
         "You have used the maximum number of hints for this difficulty level."
       );
+      setAllHintsUsed(true);
     }
 
     const unsolvedCells = [];
@@ -81,24 +86,26 @@ const CrosswordGrid: React.FC = () => {
       }
     }
 
-    if (unsolvedCells.length === 0) return;
+    if (!allHintsUsed) {
+      if (unsolvedCells.length === 0) return;
 
-    const randomCellKey =
-      unsolvedCells[Math.floor(Math.random() * unsolvedCells.length)];
-    const [rowIndex, cellIndex] = randomCellKey.split(",").map(Number);
-    const correctChar = grid[rowIndex][cellIndex];
+      const randomCellKey =
+        unsolvedCells[Math.floor(Math.random() * unsolvedCells.length)];
+      const [rowIndex, cellIndex] = randomCellKey.split(",").map(Number);
+      const correctChar = grid[rowIndex][cellIndex];
 
-    setUserInput((prevInput) => ({
-      ...prevInput,
-      [randomCellKey]: correctChar,
-    }));
+      setUserInput((prevInput) => ({
+        ...prevInput,
+        [randomCellKey]: correctChar,
+      }));
 
-    setScore((prevScore) => {
-      const deduction = hintDeduction[difficulty as Difficulty];
-      return Math.max(prevScore - deduction, 0);
-    });
+      setScore((prevScore) => {
+        const deduction = hintDeduction[difficulty as Difficulty];
+        return Math.max(prevScore - deduction);
+      });
 
-    setHintsUsed(hintsUsed + 1);
+      setHintsUsed(hintsUsed + 1);
+    }
   };
 
   useEffect(() => {
@@ -170,17 +177,6 @@ const CrosswordGrid: React.FC = () => {
 
   const crosswordContainerRef = useRef<HTMLDivElement>(null);
 
-  // const handlePrint = () => {
-  //   const crosswordContainer = crosswordContainerRef.current;
-  //   const cluesContainer = document.querySelector(".crossword-clues");
-
-  //   (crosswordContainer as HTMLElement)?.focus();
-  //   window.print();
-
-  //   (cluesContainer as HTMLElement)?.focus();
-  //   window.print();
-  // };
-
   const handleNext = () => {
     if (difficulty === "Easy") {
       updateDifficulty("Normal");
@@ -188,6 +184,7 @@ const CrosswordGrid: React.FC = () => {
       updateDifficulty("Hard");
     } else {
       setCompleted(true);
+      localStorage.removeItem("score");
     }
 
     // don't change the difficulty level, just reload the page
@@ -228,6 +225,11 @@ const CrosswordGrid: React.FC = () => {
       );
 
       setShowSuccessAlert(isCompletedCorrectly);
+      // setScore((prevScore) => {
+      //   const newScore = prevScore + 10;
+      //   localStorage.setItem("score", String(newScore));
+      //   return newScore;
+      // });
     };
 
     const timer = setTimeout(checkCompletion, 100);
@@ -329,6 +331,33 @@ const CrosswordGrid: React.FC = () => {
     if (newInput && grid[rowIndex][cellIndex] === newInput) {
       moveNext();
     }
+
+    const checkWordCompletion = () => {
+      layoutResult.forEach((word) => {
+        const isCompleted = word.answer.split("").every((char, index) => {
+          const key =
+            word.orientation === "across"
+              ? `${word.starty - 1},${word.startx - 1 + index}`
+              : `${word.starty - 1 + index},${word.startx - 1}`;
+          return userInput[key]?.toLowerCase() === char.toLowerCase();
+        });
+
+        if (isCompleted && !correctWords[word.answer]) {
+          setScore((prevScore) => {
+            const newScore = prevScore + 10;
+            // console.log(`Score: ${newScore}`);
+            localStorage.setItem("score", String(newScore));
+            return newScore;
+          });
+          setCorrectWords((prevCorrectWords) => ({
+            ...prevCorrectWords,
+            [word.answer]: true,
+          }));
+        }
+      });
+    };
+
+    checkWordCompletion();
   };
 
   if (isLoading) {
