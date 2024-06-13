@@ -8,8 +8,8 @@ import {
 
 export default function Navbar() {
     return(
-        <div className="flex justify-between my-3 mx-4">
-            <div>
+        <div className="flex justify-between my-6 mx-4">
+            <div className="cursor-pointer">
                 CulinaryCross
             </div>           
             <ModeToggle />
