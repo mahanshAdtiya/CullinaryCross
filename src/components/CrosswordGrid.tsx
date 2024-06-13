@@ -330,22 +330,7 @@ const CrosswordGrid: React.FC = () => {
           </AlertDescription>
         </Alert>
       )}
-      <div className="flex w-full">
-        <div className="flex-1 items-center mb-5">
-          <CustomizePanel
-            onUpdateDifficulty={updateDifficulty}
-            onUseHint={useHint}
-            onPrint={handlePrint}
-          />
-        </div>
-        <div className="flex items-center mt-4 ml-4 mb-5">
-          <div className="text-xl mr-5">
-            <strong>SCORE: {score}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex w-full max-w-6xl">
+      <div className="flex flex-col lg:flex-row justify-center items-start w-full max-w-6xl">
         <div ref={crosswordContainerRef} className="crossword-container">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
@@ -375,11 +360,19 @@ const CrosswordGrid: React.FC = () => {
                 const expectedChar = cell ? cell.toLowerCase() : "";
                 const isCorrect =
                   userInput[key]?.toLowerCase() === expectedChar && cell !== "";
-                const borderColor = isCorrect && cell !== "" ? "green" : "gray";
+                const borderColor =
+                  isCorrect && cell !== "" && difficulty !== "Hard"
+                    ? "green"
+                    : "gray";
                 const borderWidth = cell !== "" ? "1px" : "1px";
                 const backgroundColor =
-                  isCorrect && cell !== "" ? "#abf7b1" : cellBackgroundClass;
-                const textColor = isCorrect && cell !== "" ? "black" : "white";
+                  isCorrect && cell !== "" && difficulty !== "Hard"
+                    ? "#abf7b1"
+                    : cellBackgroundClass;
+                const textColor =
+                  isCorrect && cell !== "" && difficulty !== "Hard"
+                    ? "black"
+                    : "white";
 
                 return (
                   <div
@@ -392,17 +385,18 @@ const CrosswordGrid: React.FC = () => {
                       </span>
                     )}
                     <textarea
+                      id={`cell-${rowIndex}-${cellIndex}`}
                       className={`border-2 border-gray-300 p-1 md:p-2 text-center align-middle ${
                         !cell && "text-gray-300"
                       } w-full h-full`}
                       maxLength={1}
                       value={userInput[key]}
-                      onChange={(e) => handleInputChange(e, rowIndex, cellIndex)}
+                      onChange={(e) =>
+                        handleInputChange(e, rowIndex, cellIndex)
+                      }
                       onKeyDown={(e) => handleKeyDown(e, rowIndex, cellIndex)}
                       data-key={`${rowIndex},${cellIndex}`}
                       disabled={!cell}
-                      id={`textarea-${rowIndex}-${cellIndex}`}
-                      name={`textarea-${rowIndex}-${cellIndex}`} 
                       style={{
                         resize: "none",
                         overflow: "hidden",
@@ -418,11 +412,25 @@ const CrosswordGrid: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="flex-1 items-center">
-          <div className="crossword-clues px-5 py-1">
-            {clues && <LeftPanel layoutResult={layoutResult} />}
+        <div className="flex-1 items-center ml-5">
+          <CustomizePanel
+            onUpdateDifficulty={updateDifficulty}
+            onUseHint={useHint}
+            onPrint={handlePrint}
+          />
+          <div className="mt-4">
+            <div className="mt-4">
+              <div className="mt-4">
+                <div className="text-xl">
+                  <strong>Score: {score}</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+      <div className="crossword-clues w-full px-5 py-5">
+        {clues && <LeftPanel layoutResult={layoutResult} />}
       </div>
     </div>
   );
