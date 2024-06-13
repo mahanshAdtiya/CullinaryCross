@@ -12,13 +12,13 @@ import {
 interface CustomizePanelProps {
   onUpdateDifficulty: (difficulty: string) => void;
   onUseHint: () => void;
-  onPrint: () => void;
+  onNext: () => void;
 }
 
 const CustomizePanel: React.FC<CustomizePanelProps> = ({
   onUpdateDifficulty,
   onUseHint,
-  onPrint,
+  onNext,
 }) => {
   const [currentDifficulty, setCurrentDifficulty] = useState(() => {
     return localStorage.getItem("difficulty") || "Easy";
@@ -51,7 +51,9 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
               <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Easy")}>
                 Easy
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Normal")}>
+              <DropdownMenuItem
+                onSelect={() => handleUpdateDifficulty("Normal")}
+              >
                 Normal
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => handleUpdateDifficulty("Hard")}>
@@ -65,8 +67,8 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
         <Button className="mr-4" variant="outline" onClick={onUseHint}>
           Hint
         </Button>
-        <Button variant="outline" onClick={onPrint}>
-          Print
+        <Button variant="outline" onClick={onNext}>
+          Next
         </Button>
       </div>
     </>

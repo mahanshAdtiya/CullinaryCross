@@ -169,16 +169,16 @@ const CrosswordGrid: React.FC = () => {
 
   const crosswordContainerRef = useRef<HTMLDivElement>(null);
 
-  const handlePrint = () => {
-    const crosswordContainer = crosswordContainerRef.current;
-    const cluesContainer = document.querySelector(".crossword-clues");
+  // const handlePrint = () => {
+  //   const crosswordContainer = crosswordContainerRef.current;
+  //   const cluesContainer = document.querySelector(".crossword-clues");
 
-    (crosswordContainer as HTMLElement)?.focus();
-    window.print();
+  //   (crosswordContainer as HTMLElement)?.focus();
+  //   window.print();
 
-    (cluesContainer as HTMLElement)?.focus();
-    window.print();
-  };
+  //   (cluesContainer as HTMLElement)?.focus();
+  //   window.print();
+  // };
 
   useEffect(() => {
     const checkCompletion = () => {
@@ -416,7 +416,7 @@ const CrosswordGrid: React.FC = () => {
           <CustomizePanel
             onUpdateDifficulty={updateDifficulty}
             onUseHint={useHint}
-            onPrint={handlePrint}
+            onNext={handleNext}
           />
           <div className="mt-4">
             <div className="mt-4">
