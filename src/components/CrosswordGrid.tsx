@@ -23,9 +23,7 @@ const CrosswordGrid: React.FC = () => {
     Hard: 6,
   };
 
-  const [difficulty, setDifficulty] = useState<Difficulty>(() => {
-    return (localStorage.getItem("difficulty") as Difficulty) || "Easy";
-  });
+  const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
 
   const [grid, setGrid] = useState<string[][]>([]);
   const [score, setScore] = useState(initialScore);
@@ -46,6 +44,13 @@ const CrosswordGrid: React.FC = () => {
   const toggleFeedbackEnabled = () => {
     setFeedbackEnabled(!feedbackEnabled);
   };
+
+  useEffect(() => {
+    const storedDifficulty = localStorage.getItem("difficulty") as Difficulty;
+    if (storedDifficulty) {
+      setDifficulty(storedDifficulty);
+    }
+  }, []);
 
   const updateDifficulty = (newDifficulty: string) => {
     if (

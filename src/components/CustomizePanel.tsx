@@ -20,12 +20,13 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
   onUseHint,
   onNext,
 }) => {
-  const [currentDifficulty, setCurrentDifficulty] = useState(() => {
-    return localStorage.getItem("difficulty") || "Easy";
-  });
+  const [currentDifficulty, setCurrentDifficulty] = useState("Easy");
 
   useEffect(() => {
-    setCurrentDifficulty(localStorage.getItem("difficulty") || "Easy");
+    const storedDifficulty = localStorage.getItem("difficulty");
+    if (storedDifficulty) {
+      setCurrentDifficulty(storedDifficulty);
+    }
   }, []);
 
   const handleUpdateDifficulty = (difficulty: string) => {
@@ -35,7 +36,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
   };
 
   return (
-    <>
+    <div>
       <div className="flex customize-panel items-center gap-4">
         <div className="flex text-xl">Difficulty Level:</div>
         <div className="flex">
@@ -71,7 +72,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
           Next
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 
