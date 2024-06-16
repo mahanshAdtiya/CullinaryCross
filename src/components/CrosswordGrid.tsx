@@ -478,12 +478,12 @@ const CrosswordGrid: React.FC = () => {
                           </a>
                         </NavigationMenuLink>
                       </li>
-                      <WhatsappShareButton url={shareUrl} onClick={handleShareClick} title={shareMessage}>
+                      <WhatsappShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
                         <ListItem title="WhatsApp">
                           Share with your friends on WhatsApp?
                         </ListItem>
                       </WhatsappShareButton>
-                      <TwitterShareButton url={shareUrl} onClick={handleShareClick} title={shareMessage}>
+                      <TwitterShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
                         <ListItem title="Twitter">
                           Post on Twitter ?
                         </ListItem>
