@@ -4,6 +4,16 @@ import LeftPanel from "./LeftPanel";
 import wordsList from "../data/words.json";
 import CustomizePanel from "./CustomizePanel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { WhatsappShareButton, WhatsappIcon, TwitterShareButton, TwitterIcon } from 'react-share';
+import { cn } from "@/lib/utils"
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
 
 interface WordLayout {
   answer: string;
@@ -40,6 +50,43 @@ const CrosswordGrid: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [correctWords, setCorrectWords] = useState<Record<string, boolean>>({});
   const [allHintsUsed, setAllHintsUsed] = useState(false);
+  const [shareMessage, setShareMessage] = useState<string>('Check out this link!');
+  const shareUrl = 'https://cosylab.iiitd.edu.in/crossword/';
+  const [time, setTime] = useState<number>(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (!showSuccessAlert) {
+      timerRef.current = setInterval(() => {
+        setTime(prevTime => prevTime + 1);
+      }, 1000); 
+    }
+
+    if (showSuccessAlert && timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [showSuccessAlert]);
+
+  const handleShareClick = () => {
+    const message = `Heyy, Check out this fun game which helps you test your knowledge about food
+
+      I scored ${score} in ${formatTime(time)}, let's see how much you can score, 
+      Here's the link: ${shareUrl}`;
+    setShareMessage(message);
+  };
+
+  const formatTime = (totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours > 0 ? `${hours}h ` : ''}${minutes > 0 || hours > 0 ? `${minutes}m ` : ''}${seconds}s`;
+  };
 
   const toggleFeedbackEnabled = () => {
     setFeedbackEnabled(!feedbackEnabled);
@@ -151,6 +198,7 @@ const CrosswordGrid: React.FC = () => {
         const correspondingWord = wordsList.find(
           (wordObj: any) => wordObj.word.toLowerCase() === word.answer
         );
+        console.log(correspondingWord) ;
         return correspondingWord
           ? { ...word, clue: correspondingWord.clue }
           : word;
@@ -401,7 +449,52 @@ const CrosswordGrid: React.FC = () => {
           <AlertTitle>Great Job!</AlertTitle>
           <AlertDescription>
             Your crossword is complete and correct. Well done!
+            <div className="mt-2">
+              <strong>Your score : </strong>
+              <span className="text-lg font-semibold text-teal-700">{score}</span>
+            </div>
+            <div className="mt-2">
+              <strong >You took : </strong>
+              <span className="text-lg font-semibold text-teal-700">{formatTime(time)}</span>
+            </div>
           </AlertDescription>
+          <div className="mt-3">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Share your score</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <a
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                          >
+                            <div className="mb-2 text-lg font-medium">
+                              CulinaryCrossword
+                            </div>
+                            <p className="text-sm leading-tight text-muted-foreground">
+                              Fun crossword puzzles to play with your friends and family.
+                            </p>
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                      <WhatsappShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
+                        <ListItem  title="WhatsaApp">
+                          Share with your friends on WhatsaApp?
+                        </ListItem>
+                      </WhatsappShareButton>
+                      <TwitterShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
+                        <ListItem title="Twitter">
+                          Post on Twitter ?
+                        </ListItem>
+                      </TwitterShareButton>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
         </Alert>
       )}
       <div className="flex flex-col lg:flex-row justify-center items-start w-full max-w-6xl">
@@ -493,12 +586,11 @@ const CrosswordGrid: React.FC = () => {
             onNext={handleNext}
           />
           <div className="mt-4">
-            <div className="mt-4">
-              <div className="mt-4">
-                <div className="text-xl">
-                  <strong>Score: {score}</strong>
-                </div>
-              </div>
+            <div className="text-xl">
+              <strong>Score: <span className="text-teal-700">{score}</span></strong>
+            </div>
+            <div className="text-xl mt-2">
+              <strong>Time: <span className="font-semibold text-teal-600">{formatTime(time)}</span></strong>
             </div>
           </div>
         </div>
@@ -511,3 +603,28 @@ const CrosswordGrid: React.FC = () => {
 };
 
 export default CrosswordGrid;
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & { title: string }
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = "ListItem"
