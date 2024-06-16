@@ -36,7 +36,11 @@ const CrosswordGrid: React.FC = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
 
   const [grid, setGrid] = useState<string[][]>([]);
-  const [score, setScore] = useState(initialScore);
+  const [score, setScore] = useState(() => {
+    const storedScore = localStorage.getItem("score");
+    return storedScore ? parseInt(storedScore) : initialScore;
+  });
+  
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
@@ -108,9 +112,8 @@ const CrosswordGrid: React.FC = () => {
       setDifficulty(newDifficulty as Difficulty);
       setHintsUsed(0);
       localStorage.setItem("difficulty", newDifficulty);
-      const sc = localStorage.getItem("score");
-      console.log("score", sc);
-      setScore(Number(sc) || initialScore);
+      const defaultScore = 1000;
+      localStorage.setItem("score", defaultScore.toString());
       window.location.reload();
     } else {
       console.error("Invalid difficulty level:", newDifficulty);
@@ -281,10 +284,7 @@ const CrosswordGrid: React.FC = () => {
       setCompleted(true);
       localStorage.removeItem("score");
     }
-
-    // don't change the difficulty level, just reload the page
-    // setIsLoading(true);
-    // window.location.reload();
+    localStorage.setItem("score", score.toString());
   };
 
   useEffect(() => {
@@ -397,7 +397,6 @@ const CrosswordGrid: React.FC = () => {
     const borderColor = isCorrect ? "green" : "gray";
 
     const moveNext = () => {
-      // Determine the orientation of the current word
       const isHorizontal =
         wordPlacements[`${rowIndex},${cellIndex + 1}`] !== undefined ||
         wordPlacements[`${rowIndex},${cellIndex - 1}`] !== undefined;
@@ -405,12 +404,10 @@ const CrosswordGrid: React.FC = () => {
       let nextCellIndex = cellIndex;
 
       if (isHorizontal) {
-        nextCellIndex += 1; // Move right for horizontal
+        nextCellIndex += 1; 
       } else {
-        nextRowIndex += 1; // Move down for vertical
+        nextRowIndex += 1;
       }
-
-      // Check if the next cell is within the grid and not empty
       if (
         nextRowIndex < grid.length &&
         nextCellIndex < grid[0].length &&
@@ -425,7 +422,7 @@ const CrosswordGrid: React.FC = () => {
     };
 
     if (newInput && grid[rowIndex][cellIndex] === newInput) {
-      moveNext(); // Move to the next cell if the input matches the expected character
+      moveNext(); 
     }
   };
 
