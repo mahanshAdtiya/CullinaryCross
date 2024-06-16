@@ -4,7 +4,7 @@ import LeftPanel from "./LeftPanel";
 import wordsList from "../data/words.json";
 import CustomizePanel from "./CustomizePanel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { WhatsappShareButton, WhatsappIcon, TwitterShareButton, TwitterIcon } from 'react-share';
+import { WhatsappShareButton, TwitterShareButton } from 'react-share';
 import { cn } from "@/lib/utils"
 import {
   NavigationMenu,
@@ -73,10 +73,9 @@ const CrosswordGrid: React.FC = () => {
   }, [showSuccessAlert]);
 
   const handleShareClick = () => {
-    const message = `Heyy, Check out this fun game which helps you test your knowledge about food
-
-      I scored ${score} in ${formatTime(time)}, let's see how much you can score, 
-      Here's the link: ${shareUrl}`;
+    const message = `Heyy, Check out this fun game which helps you test your knowledge about food\n`
+      + `I scored ${score} in ${formatTime(time)}, let's see how much you can score,\n`
+      + `Here's the link: ${shareUrl}`;
     setShareMessage(message);
   };
 
@@ -479,12 +478,12 @@ const CrosswordGrid: React.FC = () => {
                           </a>
                         </NavigationMenuLink>
                       </li>
-                      <WhatsappShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
-                        <ListItem  title="WhatsaApp">
-                          Share with your friends on WhatsaApp?
+                      <WhatsappShareButton url={shareUrl} onClick={handleShareClick} title={shareMessage}>
+                        <ListItem title="WhatsApp">
+                          Share with your friends on WhatsApp?
                         </ListItem>
                       </WhatsappShareButton>
-                      <TwitterShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
+                      <TwitterShareButton url={shareUrl} onClick={handleShareClick} title={shareMessage}>
                         <ListItem title="Twitter">
                           Post on Twitter ?
                         </ListItem>
