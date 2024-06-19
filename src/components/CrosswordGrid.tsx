@@ -32,6 +32,7 @@ const CrosswordGrid: React.FC = () => {
     Normal: 4,
     Hard: 6,
   };
+  
 
   const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
 
