@@ -4,8 +4,8 @@ import LeftPanel from "./LeftPanel";
 import wordsList from "../data/words.json";
 import CustomizePanel from "./CustomizePanel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { WhatsappShareButton, TwitterShareButton } from 'react-share';
-import { cn } from "@/lib/utils"
+import { WhatsappShareButton, TwitterShareButton } from "react-share";
+import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,7 +13,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
 
 interface WordLayout {
   answer: string;
@@ -32,16 +32,12 @@ const CrosswordGrid: React.FC = () => {
     Normal: 4,
     Hard: 6,
   };
-  
 
   const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
 
   const [grid, setGrid] = useState<string[][]>([]);
-  const [score, setScore] = useState(() => {
-    const storedScore = localStorage.getItem("score");
-    return storedScore ? parseInt(storedScore) : initialScore;
-  });
-  
+  const [score, setScore] = useState(initialScore);
+
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
@@ -55,16 +51,31 @@ const CrosswordGrid: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [correctWords, setCorrectWords] = useState<Record<string, boolean>>({});
   const [allHintsUsed, setAllHintsUsed] = useState(false);
-  const [shareMessage, setShareMessage] = useState<string>('Check out this link!');
-  const shareUrl = 'https://cosylab.iiitd.edu.in/crossword/';
+  const [shareMessage, setShareMessage] = useState<string>(
+    "Check out this link!"
+  );
+  const shareUrl = "https://cosylab.iiitd.edu.in/crossword/";
   const [time, setTime] = useState<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedScore = localStorage.getItem("score");
+      const storedDifficulty = localStorage.getItem("difficulty") as Difficulty;
+      if (storedScore) {
+        setScore(parseInt(storedScore));
+      }
+      if (storedDifficulty) {
+        setDifficulty(storedDifficulty);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (!showSuccessAlert) {
       timerRef.current = setInterval(() => {
-        setTime(prevTime => prevTime + 1);
-      }, 1000); 
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
     }
 
     if (showSuccessAlert && timerRef.current) {
@@ -78,9 +89,12 @@ const CrosswordGrid: React.FC = () => {
   }, [showSuccessAlert]);
 
   const handleShareClick = () => {
-    const message = `Heyy, Check out this fun game which helps you test your knowledge about food\n`
-      + `I scored ${score} in ${formatTime(time)}, let's see how much you can score,\n`
-      + `Here's the link: ${shareUrl}`;
+    const message =
+      `Heyy, Check out this fun game which helps you test your knowledge about food\n` +
+      `I scored ${score} in ${formatTime(
+        time
+      )}, let's see how much you can score,\n` +
+      `Here's the link: ${shareUrl}`;
     setShareMessage(message);
   };
 
@@ -89,19 +103,14 @@ const CrosswordGrid: React.FC = () => {
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    return `${hours > 0 ? `${hours}h ` : ''}${minutes > 0 || hours > 0 ? `${minutes}m ` : ''}${seconds}s`;
+    return `${hours > 0 ? `${hours}h ` : ""}${
+      minutes > 0 || hours > 0 ? `${minutes}m ` : ""
+    }${seconds}s`;
   };
 
   const toggleFeedbackEnabled = () => {
     setFeedbackEnabled(!feedbackEnabled);
   };
-
-  useEffect(() => {
-    const storedDifficulty = localStorage.getItem("difficulty") as Difficulty;
-    if (storedDifficulty) {
-      setDifficulty(storedDifficulty);
-    }
-  }, []);
 
   const updateDifficulty = (newDifficulty: string) => {
     if (
@@ -122,9 +131,10 @@ const CrosswordGrid: React.FC = () => {
   };
 
   const useHint = () => {
+    let sc = 0;
     if (
-      (difficulty === "Normal" && hintsUsed === 10) ||
-      (difficulty === "Hard" && hintsUsed === 5)
+      (difficulty === "Normal" && hintsUsed === 10000) ||
+      (difficulty === "Hard" && hintsUsed === 500000)
     ) {
       alert(
         "You have used the maximum number of hints for this difficulty level."
@@ -164,11 +174,14 @@ const CrosswordGrid: React.FC = () => {
       setScore((prevScore) => {
         const deduction = hintDeduction[difficulty as Difficulty];
         if (deduction === 2) {
-          return Math.max(prevScore - deduction);
+          sc = unsolvedCells.length * deduction;
+          return Math.max(prevScore - deduction, sc);
         } else if (deduction === 4) {
-          return Math.max(prevScore - deduction, 960);
+          sc = unsolvedCells.length * deduction;
+          return Math.max(prevScore - deduction, sc);
         } else {
-          return Math.max(prevScore - deduction, 970);
+          sc = unsolvedCells.length * deduction;
+          return Math.max(prevScore - deduction, sc);
         }
       });
 
@@ -201,7 +214,7 @@ const CrosswordGrid: React.FC = () => {
         const correspondingWord = wordsList.find(
           (wordObj: any) => wordObj.word.toLowerCase() === word.answer
         );
-        console.log(correspondingWord) ;
+        console.log(correspondingWord);
         return correspondingWord
           ? { ...word, clue: correspondingWord.clue }
           : word;
@@ -405,7 +418,7 @@ const CrosswordGrid: React.FC = () => {
       let nextCellIndex = cellIndex;
 
       if (isHorizontal) {
-        nextCellIndex += 1; 
+        nextCellIndex += 1;
       } else {
         nextRowIndex += 1;
       }
@@ -423,7 +436,7 @@ const CrosswordGrid: React.FC = () => {
     };
 
     if (newInput && grid[rowIndex][cellIndex] === newInput) {
-      moveNext(); 
+      moveNext();
     }
   };
 
@@ -448,43 +461,54 @@ const CrosswordGrid: React.FC = () => {
             Your crossword is complete and correct. Well done!
             <div className="mt-2">
               <strong>Your score : </strong>
-              <span className="text-lg font-semibold text-teal-700">{score}</span>
+              <span className="text-lg font-semibold text-teal-700">
+                {score}
+              </span>
             </div>
             <div className="mt-2">
-              <strong >You took : </strong>
-              <span className="text-lg font-semibold text-teal-700">{formatTime(time)}</span>
+              <strong>You took : </strong>
+              <span className="text-lg font-semibold text-teal-700">
+                {formatTime(time)}
+              </span>
             </div>
           </AlertDescription>
           <div className="mt-3">
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Share your score</NavigationMenuTrigger>
+                  <NavigationMenuTrigger>
+                    Share your score
+                  </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
-                          <a
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                          >
+                          <a className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md">
                             <div className="mb-2 text-lg font-medium">
                               CulinaryCrossword
                             </div>
                             <p className="text-sm leading-tight text-muted-foreground">
-                              Fun crossword puzzles to play with your friends and family.
+                              Fun crossword puzzles to play with your friends
+                              and family.
                             </p>
                           </a>
                         </NavigationMenuLink>
                       </li>
-                      <WhatsappShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
+                      <WhatsappShareButton
+                        url={shareUrl}
+                        title={shareMessage}
+                        onClick={handleShareClick}
+                      >
                         <ListItem title="WhatsApp">
                           Share with your friends on WhatsApp?
                         </ListItem>
                       </WhatsappShareButton>
-                      <TwitterShareButton url={shareUrl} title={shareMessage} onClick={handleShareClick}>
-                        <ListItem title="Twitter">
-                          Post on Twitter ?
-                        </ListItem>
+                      <TwitterShareButton
+                        url={shareUrl}
+                        title={shareMessage}
+                        onClick={handleShareClick}
+                      >
+                        <ListItem title="Twitter">Post on Twitter ?</ListItem>
                       </TwitterShareButton>
                     </ul>
                   </NavigationMenuContent>
@@ -584,10 +608,17 @@ const CrosswordGrid: React.FC = () => {
           />
           <div className="mt-4">
             <div className="text-xl">
-              <strong>Score: <span className="text-teal-700">{score}</span></strong>
+              <strong>
+                Score: <span className="text-teal-700">{score}</span>
+              </strong>
             </div>
             <div className="text-xl mt-2">
-              <strong>Time: <span className="font-semibold text-teal-600">{formatTime(time)}</span></strong>
+              <strong>
+                Time:{" "}
+                <span className="font-semibold text-teal-600">
+                  {formatTime(time)}
+                </span>
+              </strong>
             </div>
           </div>
         </div>
@@ -622,6 +653,6 @@ const ListItem = React.forwardRef<
         </a>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
+ListItem.displayName = "ListItem";
