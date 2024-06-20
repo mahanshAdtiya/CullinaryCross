@@ -1,3 +1,5 @@
+// change deduction for hints
+
 import React, { useState, useRef, useEffect } from "react";
 import { generateLayout } from "../lib/layout_generator";
 import LeftPanel from "./LeftPanel";
