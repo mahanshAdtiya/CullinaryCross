@@ -2,6 +2,7 @@ node_modules/
 .next/
 package-lock.json
 dist/
+out/
 dist-ssr/
 *.local
 .DS_Store
