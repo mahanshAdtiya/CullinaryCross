@@ -4,7 +4,14 @@ import LeftPanel from "./LeftPanel";
 import wordsList from "../data/words.json";
 import CustomizePanel from "./CustomizePanel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { WhatsappShareButton, TwitterShareButton } from "react-share";
+import {
+  WhatsappShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  FacebookShareButton,
+  TelegramShareButton,
+  RedditShareButton,
+} from "react-share";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -94,8 +101,8 @@ const CrosswordGrid: React.FC = () => {
       `I scored ${score} in ${formatTime(
         time
       )}, let's see how much you can score,\n` +
-      `Here's the link: ${shareUrl}`;
-      console.log(message);
+      `Here's the link: `;
+    console.log(message);
     setShareMessage(message);
   };
 
@@ -495,20 +502,32 @@ const CrosswordGrid: React.FC = () => {
                           </a>
                         </NavigationMenuLink>
                       </li>
-                      <WhatsappShareButton
-                        url={shareUrl}
-                        title={shareMessage}
-                      >
+                      <WhatsappShareButton url={shareUrl} title={shareMessage}>
                         <ListItem title="WhatsApp">
                           Share with your friends on WhatsApp?
                         </ListItem>
                       </WhatsappShareButton>
-                      <TwitterShareButton
-                        url={shareUrl}
-                        title={shareMessage}
-                      >
+                      <TwitterShareButton url={shareUrl} title={shareMessage}>
                         <ListItem title="Twitter">Post on Twitter ?</ListItem>
                       </TwitterShareButton>
+                      <LinkedinShareButton url={shareUrl} title={shareMessage}>
+                        <ListItem title="LinkedIn">
+                          Share on LinkedIn ?
+                        </ListItem>
+                      </LinkedinShareButton>
+                      <FacebookShareButton url={shareUrl} title={shareMessage}>
+                        <ListItem title="Facebook">
+                          Share on Facebook ?
+                        </ListItem>
+                      </FacebookShareButton>
+                      <TelegramShareButton url={shareUrl} title={shareMessage}>
+                        <ListItem title="Telegram">
+                          Share on Telegram ?
+                        </ListItem>
+                      </TelegramShareButton>
+                      <RedditShareButton url={shareUrl} title={shareMessage}>
+                        <ListItem title="Reddit">Share on Reddit ?</ListItem>
+                      </RedditShareButton>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
