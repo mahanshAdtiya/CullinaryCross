@@ -1,5 +1,3 @@
-// change deduction for hints
-
 import React, { useState, useRef, useEffect } from "react";
 import { generateLayout } from "../lib/layout_generator";
 import LeftPanel from "./LeftPanel";
@@ -97,6 +95,7 @@ const CrosswordGrid: React.FC = () => {
         time
       )}, let's see how much you can score,\n` +
       `Here's the link: ${shareUrl}`;
+      console.log(message);
     setShareMessage(message);
   };
 
@@ -334,7 +333,7 @@ const CrosswordGrid: React.FC = () => {
           return correctChar === userChar;
         }
       );
-
+      handleShareClick();
       setShowSuccessAlert(isCompletedCorrectly);
     };
 
@@ -499,7 +498,6 @@ const CrosswordGrid: React.FC = () => {
                       <WhatsappShareButton
                         url={shareUrl}
                         title={shareMessage}
-                        onClick={handleShareClick}
                       >
                         <ListItem title="WhatsApp">
                           Share with your friends on WhatsApp?
@@ -508,7 +506,6 @@ const CrosswordGrid: React.FC = () => {
                       <TwitterShareButton
                         url={shareUrl}
                         title={shareMessage}
-                        onClick={handleShareClick}
                       >
                         <ListItem title="Twitter">Post on Twitter ?</ListItem>
                       </TwitterShareButton>
